@@ -50,9 +50,18 @@ class BivariateAccumulator {
 struct Estimate {
   double mean = 0.0;
   double std_error = 0.0;
+  double beta = 0.0;  ///< Control variate coefficient; zero if no control was used.
 };
 
 /// Sample mean of x and its standard error. Requires at least two samples.
 [[nodiscard]] Estimate estimate_mean(const BivariateAccumulator& samples);
+
+/// Estimates E[x] as mean(x) - beta * (mean(y) - control_mean), where control_mean is the exact
+/// E[y] and beta = Cov(x, y) / Var(y) minimises the variance. Requires at least four samples.
+///
+/// Beta is estimated from the same samples. The resulting bias is O(1/n), negligible next to the
+/// O(1/sqrt(n)) standard error, and a separate pilot run is not needed.
+[[nodiscard]] Estimate estimate_with_control(const BivariateAccumulator& samples,
+                                             double control_mean);
 
 }  // namespace mcpricer

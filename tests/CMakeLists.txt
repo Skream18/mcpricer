@@ -16,6 +16,7 @@ add_executable(mcpricer_tests
   test_payoffs.cpp
   test_philox.cpp
   test_statistics.cpp
+  test_variance_reduction.cpp
   test_version.cpp
 )
 target_link_libraries(mcpricer_tests PRIVATE mcpricer_core GTest::gtest_main)

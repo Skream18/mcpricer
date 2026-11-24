@@ -5,6 +5,8 @@
 #include <string>
 #include <variant>
 
+#include "mcpricer/analytic.hpp"
+
 namespace mcpricer {
 namespace {
 
@@ -22,16 +24,41 @@ SimulationTask make_task(const MarketParams& market, const OptionSpec& option,
   task.step_diffusion = market.volatility * std::sqrt(dt);
   task.discount = std::exp(-market.rate * option.maturity);
   task.seed = config.seed;
-  task.samples = config.paths;
+  task.antithetic = config.antithetic;
+  task.samples = config.antithetic ? config.paths / 2 : config.paths;
   return task;
+}
+
+/// Exact mean of the discounted control that the option's payoff reports on each path.
+double control_mean(const MarketParams& market, const OptionSpec& option) {
+  switch (option.style) {
+    case OptionStyle::European:  // Discounted S_T, whose mean is S0 less the dividends.
+      return market.spot * std::exp(-market.dividend * option.maturity);
+    case OptionStyle::AsianArithmetic:
+      return geometric_asian_price(market, option);
+    case OptionStyle::AsianGeometric:
+      break;
+  }
+  throw std::invalid_argument(
+      "control variate is not available for geometric Asian options: the option would be its own "
+      "control and simply return the closed form");
 }
 
 }  // namespace
 
 void validate(const SimulationConfig& config) {
+  const auto got = [&] { return ", got " + std::to_string(config.paths); };
   if (config.paths < 2 || config.paths > kMaxPaths) {
-    throw std::invalid_argument("paths must be in [2, " + std::to_string(kMaxPaths) + "], got " +
-                                std::to_string(config.paths));
+    throw std::invalid_argument("paths must be in [2, " + std::to_string(kMaxPaths) + "]" + got());
+  }
+  if (config.antithetic && config.paths % 2 != 0) {
+    throw std::invalid_argument("paths must be even with antithetic variates" + got());
+  }
+  const std::uint64_t samples = config.antithetic ? config.paths / 2 : config.paths;
+  const std::uint64_t minimum = config.control_variate ? 4 : 2;
+  if (samples < minimum) {
+    throw std::invalid_argument("paths must provide at least " + std::to_string(minimum) +
+                                " independent samples" + got());
   }
 }
 
@@ -41,10 +68,15 @@ PricingResult price_monte_carlo(const MarketParams& market, const OptionSpec& op
   validate(option);
   validate(config);
 
+  // Computed first so that an unsupported combination fails before any simulation.
+  const double known_control_mean = config.control_variate ? control_mean(market, option) : 0.0;
+
   const auto start = std::chrono::steady_clock::now();
   const SimulationTask task = make_task(market, option, config);
   const BivariateAccumulator samples = backend.run(task);
-  const Estimate estimate = estimate_mean(samples);
+  const Estimate estimate = config.control_variate
+                                ? estimate_with_control(samples, known_control_mean)
+                                : estimate_mean(samples);
   const auto stop = std::chrono::steady_clock::now();
 
   if (!std::isfinite(estimate.mean) || !std::isfinite(estimate.std_error)) {
@@ -57,6 +89,7 @@ PricingResult price_monte_carlo(const MarketParams& market, const OptionSpec& op
           .ci_high = estimate.mean + half_width,
           .paths = config.paths,
           .samples = samples.count(),
+          .control_beta = estimate.beta,
           .wall_time = stop - start};
 }
 

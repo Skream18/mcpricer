@@ -4,6 +4,7 @@
 
 #include <cmath>
 #include <stdexcept>
+#include <utility>
 
 namespace mcpricer {
 namespace {
@@ -58,6 +59,31 @@ TEST(Accumulator, StableForLargeOffset) {
   BivariateAccumulator acc;
   for (const double x : {4.0, 7.0, 13.0, 16.0}) acc.add(1e9 + x, 0.0);
   EXPECT_DOUBLE_EQ(acc.sum_xx() / 3.0, 30.0);
+}
+
+TEST(Estimate, ControlMatchesHandComputedRegression) {
+  BivariateAccumulator acc;
+  for (const auto& [x, y] : {std::pair{1.0, 1.0}, {3.0, 2.0}, {3.0, 3.0}, {5.0, 4.0}})
+    acc.add(x, y);
+  // beta = 6 / 5, residual = 8 - 1.2 * 6 = 0.8, mean = 3 - 1.2 * (2.5 - 2).
+  const Estimate estimate = estimate_with_control(acc, 2.0);
+  EXPECT_NEAR(estimate.beta, 1.2, 1e-12);
+  EXPECT_NEAR(estimate.mean, 2.4, 1e-12);
+  EXPECT_NEAR(estimate.std_error, std::sqrt(0.8 / 2.0 / 4.0), 1e-12);
+}
+
+TEST(Estimate, ConstantControlFallsBackToPlainMean) {
+  BivariateAccumulator acc;
+  for (const double x : {1.0, 2.0, 3.0, 4.0}) acc.add(x, 7.0);
+  const Estimate estimate = estimate_with_control(acc, 99.0);
+  EXPECT_EQ(estimate.beta, 0.0);
+  EXPECT_EQ(estimate.mean, 2.5);
+}
+
+TEST(Estimate, ControlRequiresFourSamples) {
+  BivariateAccumulator acc;
+  for (const double x : {1.0, 2.0, 3.0}) acc.add(x, x);
+  EXPECT_THROW((void)estimate_with_control(acc, 0.0), std::invalid_argument);
 }
 
 TEST(Estimate, RequiresTwoSamples) {

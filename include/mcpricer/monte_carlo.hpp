@@ -11,6 +11,8 @@ namespace mcpricer {
 struct SimulationConfig {
   std::uint64_t paths = 1'000'000;
   std::uint64_t seed = 42;
+  bool antithetic = false;
+  bool control_variate = false;
 };
 
 /// Bounds the memory a backend may use for partial results.
@@ -22,7 +24,8 @@ struct PricingResult {
   double ci_low = 0.0;  ///< 95% confidence interval.
   double ci_high = 0.0;
   std::uint64_t paths = 0;    ///< Simulated paths.
-  std::uint64_t samples = 0;  ///< Independent observations behind the standard error.
+  std::uint64_t samples = 0;  ///< Independent observations: paths, or pairs if antithetic.
+  double control_beta = 0.0;
   std::chrono::duration<double> wall_time{};
 };
 
