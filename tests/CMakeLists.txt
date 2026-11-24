@@ -10,6 +10,8 @@ set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 add_executable(mcpricer_tests
+  test_analytic.cpp
+  test_market.cpp
   test_version.cpp
 )
 target_link_libraries(mcpricer_tests PRIVATE mcpricer_core GTest::gtest_main)

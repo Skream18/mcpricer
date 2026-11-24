@@ -18,6 +18,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 include(cmake/CompilerSettings.cmake)
 
 add_library(mcpricer_core STATIC
+  src/analytic.cpp
+  src/market.cpp
   src/version.cpp
 )
 target_include_directories(mcpricer_core PUBLIC include)
