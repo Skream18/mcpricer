@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: windows-msvc, os: windows-latest, args: "" }
+          - { name: ubuntu-gcc, os: ubuntu-latest, args: "" }
+          - { name: ubuntu-gcc-tsan, os: ubuntu-latest, args: "-DMCPRICER_SANITIZER=thread" }
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DMCPRICER_WARNINGS_AS_ERRORS=ON ${{ matrix.args }}
+      - name: Build
+        run: cmake --build build --config Release --parallel
+      - name: Test
+        run: ctest --test-dir build -C Release --output-on-failure --no-tests=error
