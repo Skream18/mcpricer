@@ -12,6 +12,7 @@ FetchContent_MakeAvailable(googletest)
 add_executable(mcpricer_tests
   test_analytic.cpp
   test_backends.cpp
+  test_cli.cpp
   test_market.cpp
   test_monte_carlo.cpp
   test_payoffs.cpp
@@ -20,7 +21,7 @@ add_executable(mcpricer_tests
   test_variance_reduction.cpp
   test_version.cpp
 )
-target_link_libraries(mcpricer_tests PRIVATE mcpricer_core GTest::gtest_main)
+target_link_libraries(mcpricer_tests PRIVATE mcpricer_cli GTest::gtest_main)
 target_compile_definitions(mcpricer_tests PRIVATE MCPRICER_EXPECTED_VERSION="${PROJECT_VERSION}")
 mcpricer_set_warnings(mcpricer_tests)
 

@@ -42,6 +42,8 @@ if(ENABLE_CUDA)
   target_compile_definitions(mcpricer_core PRIVATE MCPRICER_ENABLE_CUDA)
 endif()
 
+add_subdirectory(apps)
+
 if(MCPRICER_BUILD_TESTS)
   enable_testing()
   add_subdirectory(tests)
