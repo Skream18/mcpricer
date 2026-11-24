@@ -214,3 +214,14 @@ Finally: clone fresh, build, test, run the example CLI command serial and thread
 ## 11. Non-goals
 
 SIMD intrinsics, stochastic volatility, American options, Sobol, MC Greeks and Python bindings. These are listed as future work to keep the core to a few hundred lines.
+
+## 12. Changes made during implementation
+
+The sections above are the approved plan. The code differs as follows:
+
+- The engine is a free function, `price_monte_carlo`, instead of a class: it has no state.
+- `OptionType` became `OptionStyle` plus `OptionRight`. Geometric Asian puts are supported too.
+- Chunks hold 1024 samples, not 4096, so that small runs can use more threads. `paths` is capped
+  at 10^9 to bound memory.
+- The kernel is `noexcept`, so workers need no exception transport.
+- Antithetic runs are not equal in cost to plain ones but cheaper, since a pair shares its normals.

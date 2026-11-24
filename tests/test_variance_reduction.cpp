@@ -25,7 +25,8 @@ OptionSpec make_option(OptionStyle style, OptionRight right) {
   return {.style = style, .right = right, .strike = 100, .maturity = 1.0, .steps = 12};
 }
 
-// Same number of simulated paths in every comparison, so the cost is about equal.
+// Every comparison uses the same number of simulated paths. Antithetic runs draw half the normals,
+// so they are not more expensive.
 TEST(VarianceReduction, AntitheticLowersStandardError) {
   for (const OptionStyle style :
        {OptionStyle::European, OptionStyle::AsianArithmetic, OptionStyle::AsianGeometric}) {
