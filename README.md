@@ -11,8 +11,7 @@ of threads.**
 - Counter-based random numbers (Philox4x32-10), chosen to carry over to a GPU
 - 78 tests, including confidence-interval calibration
 
-Further reading: [PLAN.md](PLAN.md) (design), [docs/LEARNING.md](docs/LEARNING.md) (concepts
-explained), [docs/CUDA_ROADMAP.md](docs/CUDA_ROADMAP.md) (planned GPU backend).
+The planned GPU backend is described in [docs/CUDA_ROADMAP.md](docs/CUDA_ROADMAP.md).
 
 ## Example
 
