@@ -20,6 +20,11 @@ include(cmake/CompilerSettings.cmake)
 add_library(mcpricer_core STATIC
   src/analytic.cpp
   src/market.cpp
+  src/monte_carlo.cpp
+  src/path_kernel.cpp
+  src/payoffs.cpp
+  src/serial_backend.cpp
+  src/statistics.cpp
   src/version.cpp
 )
 target_include_directories(mcpricer_core PUBLIC include)

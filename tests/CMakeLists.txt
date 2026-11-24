@@ -12,6 +12,10 @@ FetchContent_MakeAvailable(googletest)
 add_executable(mcpricer_tests
   test_analytic.cpp
   test_market.cpp
+  test_monte_carlo.cpp
+  test_payoffs.cpp
+  test_philox.cpp
+  test_statistics.cpp
   test_version.cpp
 )
 target_link_libraries(mcpricer_tests PRIVATE mcpricer_core GTest::gtest_main)
