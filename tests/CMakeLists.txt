@@ -11,6 +11,7 @@ FetchContent_MakeAvailable(googletest)
 
 add_executable(mcpricer_tests
   test_analytic.cpp
+  test_backends.cpp
   test_market.cpp
   test_monte_carlo.cpp
   test_payoffs.cpp
@@ -24,4 +25,4 @@ target_compile_definitions(mcpricer_tests PRIVATE MCPRICER_EXPECTED_VERSION="${P
 mcpricer_set_warnings(mcpricer_tests)
 
 include(GoogleTest)
-gtest_discover_tests(mcpricer_tests DISCOVERY_MODE PRE_TEST)
+gtest_discover_tests(mcpricer_tests DISCOVERY_MODE PRE_TEST NO_PRETTY_VALUES)

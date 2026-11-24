@@ -25,7 +25,7 @@ struct SimulationTask {
 /// addition is not associative, so fixing both is what makes every CPU backend return the same
 /// bits for any number of threads. The size is small enough to balance load and large enough
 /// to make the cost of scheduling negligible.
-inline constexpr std::uint64_t kChunkSize = 4096;
+inline constexpr std::uint64_t kChunkSize = 1024;
 
 [[nodiscard]] constexpr std::uint64_t chunk_count(std::uint64_t samples) noexcept {
   return samples / kChunkSize + (samples % kChunkSize != 0 ? 1 : 0);
@@ -64,7 +64,9 @@ template <bool Antithetic, Payoff P>
   return accumulator;
 }
 
-/// Resolves the payoff type and the antithetic flag once per chunk and runs simulate_samples on it.
-[[nodiscard]] BivariateAccumulator simulate_chunk(const SimulationTask& task, std::uint64_t chunk);
+/// Resolves the payoff type and the antithetic flag once per chunk, then runs simulate_samples.
+/// It cannot throw: the payoffs are trivially copyable, so the variant always holds a value.
+[[nodiscard]] BivariateAccumulator simulate_chunk(const SimulationTask& task,
+                                                  std::uint64_t chunk) noexcept;
 
 }  // namespace mcpricer

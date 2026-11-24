@@ -16,7 +16,7 @@ struct SimulationConfig {
 };
 
 /// Bounds the memory a backend may use for partial results.
-inline constexpr std::uint64_t kMaxPaths = 10'000'000'000;
+inline constexpr std::uint64_t kMaxPaths = 1'000'000'000;
 
 struct PricingResult {
   double price = 0.0;

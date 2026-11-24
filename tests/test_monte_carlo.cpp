@@ -6,7 +6,7 @@
 
 #include <algorithm>
 #include <cmath>
-#include <limits>
+#include <ostream>
 #include <stdexcept>
 #include <vector>
 
@@ -50,6 +50,11 @@ struct Case {
   double strike;
   double maturity;
 };
+
+void PrintTo(const Case& c, std::ostream* out) {
+  *out << "S0=" << c.market.spot << " r=" << c.market.rate << " q=" << c.market.dividend
+       << " sigma=" << c.market.volatility << " K=" << c.strike << " T=" << c.maturity;
+}
 
 class ClosedForm : public testing::TestWithParam<Case> {};
 

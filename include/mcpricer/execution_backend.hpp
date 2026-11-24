@@ -21,4 +21,14 @@ class IExecutionBackend {
 
 [[nodiscard]] std::unique_ptr<IExecutionBackend> make_serial_backend();
 
+inline constexpr unsigned kMaxThreads = 1024;
+
+/// Returns exactly the same statistics as the serial backend, for any number of threads.
+/// Zero threads means one per hardware thread. Throws std::invalid_argument above kMaxThreads.
+[[nodiscard]] std::unique_ptr<IExecutionBackend> make_threaded_backend(unsigned threads = 0);
+
+/// Not implemented yet. Throws std::runtime_error here unless built with ENABLE_CUDA, and from
+/// run() otherwise. Always declared, so that callers need no conditional compilation.
+[[nodiscard]] std::unique_ptr<IExecutionBackend> make_cuda_backend();
+
 }  // namespace mcpricer
