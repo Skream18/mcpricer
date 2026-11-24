@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.24)
 project(mcpricer VERSION 0.1.0 LANGUAGES CXX)
 
 option(MCPRICER_BUILD_TESTS "Build the unit tests (downloads GoogleTest)" ON)
+option(MCPRICER_BUILD_BENCHMARKS "Build the benchmark program" ON)
 option(ENABLE_CUDA "Build the CUDA backend (currently a stub)" OFF)
 option(MCPRICER_WARNINGS_AS_ERRORS "Treat compiler warnings as errors" OFF)
 set(MCPRICER_SANITIZER "" CACHE STRING "Sanitizer to enable: address, thread, or empty")
@@ -43,6 +44,10 @@ if(ENABLE_CUDA)
 endif()
 
 add_subdirectory(apps)
+
+if(MCPRICER_BUILD_BENCHMARKS)
+  add_subdirectory(bench)
+endif()
 
 if(MCPRICER_BUILD_TESTS)
   enable_testing()
