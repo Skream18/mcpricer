@@ -62,7 +62,8 @@ ctest --preset gcc-release
 ```
 
 **Other compilers:** `cmake -S . -B build && cmake --build build --config Release`, then
-`ctest --test-dir build -C Release`. Only the two Windows toolchains above have been tested.
+`ctest --test-dir build -C Release`. Only the two Windows toolchains above are supported; see
+[Tests](#tests) for a known failure on Linux.
 
 | CMake option | Default | Effect |
 |---|---|---|
@@ -110,8 +111,11 @@ The suite also passes under MSVC AddressSanitizer.
 | Backends | Bit-identical prices and standard errors for 1, 2, 3, 8 and all threads |
 | Edge cases | Zero and tiny σ and T, deep in and out of the money, overflow, invalid input, malformed command lines |
 
-Seeds were fixed in advance and not tuned. The GitHub Actions workflow, which includes
-ThreadSanitizer on Linux, has not been run yet.
+Seeds were fixed in advance and not tuned.
+
+**Supported platform: Windows.** On Linux with GCC, the GitHub Actions run had one failing test of
+78, `EdgeCases.NoRandomnessGivesExactPrice` (zero volatility or zero maturity): the engine reported
+a non-finite estimate. The cause has not been found.
 
 ## Benchmarks
 
